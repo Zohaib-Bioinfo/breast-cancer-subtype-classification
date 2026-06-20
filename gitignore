@@ -1,0 +1,27 @@
+# Data files (large, downloaded at runtime)
+*.soft.gz
+*.soft
+GSE*_family*
+*.csv.gz
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Outputs that can be regenerated (optional — remove if you want to keep them tracked)
+enrichment/
+
+# Colab
+.config/
+sample_data/
