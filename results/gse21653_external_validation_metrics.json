@@ -1,0 +1,9 @@
+{
+  "external_dataset": "GSE21653",
+  "n_samples": 237,
+  "accuracy": 0.6371308016877637,
+  "precision_weighted": 0.8310724651928173,
+  "recall_weighted": 0.6371308016877637,
+  "f1_weighted": 0.6221524400575155,
+  "roc_auc_ovr_weighted": 0.8949673779161975
+}

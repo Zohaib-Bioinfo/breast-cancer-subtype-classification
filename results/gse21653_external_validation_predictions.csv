@@ -1,0 +1,238 @@
+sample_id,true_subtype,predicted_subtype
+GSM540108,Luminal B,Luminal B
+GSM540109,Luminal B,Luminal B
+GSM540110,Luminal B,Luminal B
+GSM540111,Her2,Her2
+GSM540112,Luminal A,Luminal B
+GSM540114,Luminal A,Luminal B
+GSM540116,Luminal B,Luminal B
+GSM540117,Basal,Basal
+GSM540118,Basal,Basal
+GSM540119,Basal,Luminal B
+GSM540120,Luminal B,Luminal B
+GSM540121,Basal,Basal
+GSM540122,Luminal A,Luminal B
+GSM540123,Luminal B,Her2
+GSM540124,Basal,Basal
+GSM540125,Basal,Basal
+GSM540126,Luminal A,Luminal B
+GSM540127,Basal,Basal
+GSM540128,Luminal B,Luminal B
+GSM540129,Luminal A,Luminal B
+GSM540130,Basal,Basal
+GSM540131,Luminal B,Luminal B
+GSM540132,Basal,Basal
+GSM540133,Luminal A,Luminal B
+GSM540134,Luminal A,Luminal B
+GSM540135,Luminal A,Luminal B
+GSM540136,Luminal A,Luminal A
+GSM540137,Luminal B,Luminal B
+GSM540138,Basal,Basal
+GSM540139,Luminal B,Luminal B
+GSM540140,Basal,Basal
+GSM540142,Luminal B,Luminal B
+GSM540144,Luminal A,Luminal B
+GSM540145,Luminal A,Luminal B
+GSM540146,Basal,Basal
+GSM540147,Basal,Her2
+GSM540148,Luminal B,Luminal B
+GSM540149,Luminal B,Luminal B
+GSM540150,Luminal A,Luminal B
+GSM540151,Basal,Basal
+GSM540152,Luminal B,Luminal B
+GSM540153,Luminal A,Luminal B
+GSM540156,Basal,Basal
+GSM540160,Luminal A,Her2
+GSM540161,Luminal B,Luminal B
+GSM540162,Her2,Her2
+GSM540163,Luminal A,Luminal A
+GSM540164,Basal,Her2
+GSM540165,Luminal B,Luminal B
+GSM540166,Luminal B,Luminal B
+GSM540167,Basal,Basal
+GSM540168,Luminal B,Luminal B
+GSM540169,Luminal A,Luminal A
+GSM540170,Luminal A,Luminal B
+GSM540171,Luminal A,Luminal B
+GSM540172,Luminal A,Luminal B
+GSM540173,Luminal A,Luminal B
+GSM540174,Her2,Luminal B
+GSM540175,Luminal A,Luminal A
+GSM540176,Basal,Basal
+GSM540177,Luminal B,Luminal B
+GSM540178,Luminal A,Luminal B
+GSM540179,Luminal A,Luminal B
+GSM540180,Her2,Luminal B
+GSM540181,Basal,Basal
+GSM540182,Luminal B,Luminal B
+GSM540183,Basal,Basal
+GSM540185,Luminal A,Luminal B
+GSM540186,Basal,Basal
+GSM540188,Luminal A,Luminal B
+GSM540189,Luminal A,Luminal A
+GSM540190,Luminal A,Luminal A
+GSM540191,Luminal A,Luminal B
+GSM540192,Luminal A,Luminal B
+GSM540193,Luminal A,Luminal B
+GSM540194,Luminal A,Luminal A
+GSM540195,Basal,Her2
+GSM540196,Luminal B,Luminal B
+GSM540197,Luminal A,Luminal B
+GSM540198,Luminal A,Luminal B
+GSM540199,Luminal A,Luminal B
+GSM540200,Luminal A,Luminal B
+GSM540201,Luminal B,Luminal B
+GSM540202,Luminal A,Luminal A
+GSM540203,Luminal A,Luminal A
+GSM540204,Luminal A,Luminal A
+GSM540205,Luminal A,Luminal B
+GSM540206,Basal,Her2
+GSM540207,Luminal A,Luminal B
+GSM540209,Basal,Basal
+GSM540210,Luminal A,Luminal B
+GSM540211,Luminal A,Luminal A
+GSM540212,Luminal A,Luminal B
+GSM540213,Her2,Luminal B
+GSM540214,Basal,Basal
+GSM540215,Basal,Basal
+GSM540216,Her2,Luminal B
+GSM540219,Basal,Basal
+GSM540220,Luminal A,Luminal B
+GSM540221,Luminal B,Luminal B
+GSM540222,Luminal A,Luminal B
+GSM540223,Luminal A,Luminal B
+GSM540224,Luminal B,Luminal B
+GSM540225,Luminal A,Luminal A
+GSM540226,Luminal B,Luminal B
+GSM540227,Luminal A,Luminal A
+GSM540228,Luminal A,Luminal B
+GSM540229,Luminal A,Luminal B
+GSM540230,Luminal A,Luminal B
+GSM540231,Luminal B,Luminal B
+GSM540232,Luminal A,Luminal A
+GSM540233,Luminal A,Luminal A
+GSM540234,Luminal A,Luminal B
+GSM540236,Basal,Her2
+GSM540237,Basal,Basal
+GSM540238,Basal,Basal
+GSM540239,Luminal A,Luminal B
+GSM540240,Luminal A,Luminal A
+GSM540241,Luminal A,Luminal A
+GSM540243,Luminal A,Luminal B
+GSM540245,Luminal B,Luminal B
+GSM540246,Luminal A,Luminal B
+GSM540247,Luminal A,Luminal B
+GSM540248,Basal,Basal
+GSM540249,Basal,Basal
+GSM540250,Her2,Her2
+GSM540251,Her2,Her2
+GSM540253,Luminal B,Luminal B
+GSM540254,Basal,Basal
+GSM540255,Basal,Basal
+GSM540256,Basal,Basal
+GSM540257,Her2,Luminal B
+GSM540258,Luminal A,Luminal B
+GSM540260,Basal,Basal
+GSM540261,Basal,Basal
+GSM540262,Luminal A,Luminal B
+GSM540264,Basal,Basal
+GSM540265,Her2,Her2
+GSM540266,Luminal B,Luminal B
+GSM540267,Basal,Basal
+GSM540268,Her2,Her2
+GSM540269,Luminal B,Luminal B
+GSM540270,Luminal B,Luminal B
+GSM540271,Basal,Basal
+GSM540272,Her2,Her2
+GSM540273,Basal,Basal
+GSM540274,Her2,Her2
+GSM540275,Luminal A,Luminal B
+GSM540276,Basal,Basal
+GSM540277,Luminal B,Luminal B
+GSM540278,Luminal B,Luminal B
+GSM540279,Luminal A,Luminal B
+GSM540280,Luminal A,Luminal B
+GSM540281,Basal,Basal
+GSM540282,Basal,Basal
+GSM540283,Her2,Luminal B
+GSM540284,Luminal B,Luminal B
+GSM540285,Basal,Basal
+GSM540286,Luminal A,Luminal B
+GSM540287,Luminal A,Luminal B
+GSM540288,Basal,Basal
+GSM540289,Her2,Her2
+GSM540291,Basal,Her2
+GSM540292,Basal,Basal
+GSM540294,Basal,Basal
+GSM540295,Luminal B,Luminal B
+GSM540296,Luminal A,Luminal B
+GSM540297,Her2,Luminal B
+GSM540298,Luminal B,Luminal B
+GSM540299,Luminal B,Luminal B
+GSM540302,Basal,Basal
+GSM540303,Luminal B,Luminal B
+GSM540304,Basal,Basal
+GSM540305,Luminal A,Luminal B
+GSM540306,Luminal B,Luminal B
+GSM540307,Basal,Basal
+GSM540309,Her2,Her2
+GSM540310,Basal,Basal
+GSM540311,Luminal B,Luminal B
+GSM540313,Luminal A,Luminal B
+GSM540315,Luminal A,Luminal B
+GSM540316,Luminal B,Luminal B
+GSM540317,Luminal A,Luminal B
+GSM540318,Luminal A,Luminal B
+GSM540320,Luminal B,Luminal B
+GSM540321,Luminal A,Luminal B
+GSM540322,Luminal A,Luminal B
+GSM540323,Her2,Her2
+GSM540324,Luminal A,Luminal B
+GSM540325,Basal,Basal
+GSM540326,Luminal B,Luminal B
+GSM540327,Her2,Luminal B
+GSM540328,Luminal A,Luminal A
+GSM540329,Luminal A,Luminal B
+GSM540330,Luminal A,Luminal A
+GSM540331,Basal,Basal
+GSM540332,Luminal B,Basal
+GSM540333,Luminal B,Luminal B
+GSM540334,Luminal A,Luminal B
+GSM540335,Luminal A,Luminal A
+GSM540336,Luminal B,Luminal B
+GSM540337,Luminal A,Luminal A
+GSM540338,Luminal A,Luminal A
+GSM540339,Her2,Her2
+GSM540340,Luminal A,Luminal B
+GSM540341,Luminal B,Luminal B
+GSM540342,Luminal B,Luminal B
+GSM540343,Luminal B,Luminal B
+GSM540344,Luminal A,Luminal B
+GSM540345,Basal,Basal
+GSM540346,Her2,Her2
+GSM540347,Luminal A,Luminal B
+GSM540348,Basal,Basal
+GSM540349,Luminal A,Luminal B
+GSM540350,Luminal A,Luminal B
+GSM540351,Basal,Basal
+GSM540352,Basal,Basal
+GSM540353,Basal,Her2
+GSM540354,Her2,Her2
+GSM540355,Basal,Basal
+GSM540356,Basal,Basal
+GSM540357,Basal,Basal
+GSM540358,Her2,Her2
+GSM540359,Basal,Basal
+GSM540360,Basal,Basal
+GSM540361,Basal,Basal
+GSM540362,Basal,Basal
+GSM540363,Luminal A,Luminal B
+GSM540364,Basal,Luminal B
+GSM540365,Basal,Basal
+GSM540366,Basal,Basal
+GSM540368,Basal,Basal
+GSM540369,Basal,Basal
+GSM540370,Her2,Her2
+GSM540371,Basal,Basal
+GSM540372,Basal,Basal
+GSM540373,Basal,Basal
