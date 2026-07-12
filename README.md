@@ -1,65 +1,61 @@
-# Breast Cancer Molecular Subtype Classification
+# Breast Cancer Subtype Classification — ML-Derived Biomarker Discovery Pipeline
 
-Machine learning pipeline for classifying breast cancer molecular subtypes (Basal, HER2, Luminal A, Luminal B) from gene expression microarray data using the GSE45827 dataset.
+XGBoost + SHAP pipeline for classifying breast cancer molecular subtypes (Basal, HER2, Luminal A, Luminal B) from Affymetrix microarray data, with systematic robustness testing of the resulting biomarker panel before downstream prognostic validation.
 
-## Overview
-
-This project applies XGBoost classification to Affymetrix GPL570 microarray expression profiles to distinguish the four major intrinsic molecular subtypes of breast cancer. The pipeline includes feature selection, model training, cross-validation, biomarker identification, SHAP-based explainability, and pathway enrichment analysis.
-
-## Dataset
-
-- **Source:** [GSE45827](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE45827) (Gene Expression Omnibus)
-- **Platform:** GPL570 (Affymetrix Human Genome U133 Plus 2.0 Array)
-- **Samples used:** 130 primary tumor samples
-  - Basal: 41
-  - HER2: 30
-  - Luminal A: 29
-  - Luminal B: 30
-
-## Methods
-
-1. **Data acquisition** — Downloaded via `GEOparse`, expression matrix extracted with subtype labels from sample metadata.
-2. **Feature selection** — Top 300 probes selected using mutual information (`SelectKBest`, `mutual_info_classif`).
-3. **Classification** — XGBoost multi-class classifier (`XGBClassifier`).
-4. **Evaluation** — Stratified 5-fold cross-validation (leak-free, using `sklearn.Pipeline`) as the primary performance metric, since the dataset size (n=130) makes a single train/test split unreliable.
-5. **Explainability** — SHAP (TreeExplainer) for feature-level model interpretation.
-6. **Biomarker mapping** — Probe IDs converted to HGNC gene symbols via `mygene`.
-7. **Pathway enrichment** — Over-representation analysis against KEGG and GO Biological Process using `gseapy` (Enrichr).
-
-## Results
-
-| Metric | Value |
-|---|---|
-| 5-Fold CV Accuracy | 94.6% ± 3.1% |
-| ROC-AUC (Basal) | 1.000 |
-| ROC-AUC (HER2) | 0.999 |
-| ROC-AUC (Luminal A) | 0.987 |
-| ROC-AUC (Luminal B) | 0.981 |
-
-Top enriched biological pathways among selected biomarker genes include cell cycle regulation, mitotic spindle checkpoint signaling, and PI3K signaling — consistent with known proliferative and signaling differences across breast cancer subtypes.
-
-### Visualizations
-
-- `figures/PCA_subtypes.png` — PCA showing subtype separability
-- `figures/biomarker_heatmap.png` — Expression heatmap of top biomarker genes
-- `figures/ROC_CV_curves.png` — Cross-validated multi-class ROC curves
-- `figures/enrichment_dotplot.png` — Pathway enrichment results
-- `figures/confusion_matrix.png` — Classification confusion matrix
+This repository covers **biomarker discovery and pipeline robustness testing**. Prognostic validation of the resulting gene panel in the METABRIC cohort is covered in the companion repository: [breast-cancer-survival-biomarkers](https://github.com/Zohaib-Bioinfo/breast-cancer-survival-biomarkers).
 
 ## Repository Structure
 
 ```
 breast-cancer-subtype-classification/
 ├── README.md
-├── requirements.txt
 ├── notebooks/
-│   └── BreastCancerMolecularSubtypeClassification.ipynb
-├── figures/
-│   └── (generated plots)
+│   ├── 01_subtype_classification_training.ipynb   # Original discovery pipeline (GSE45827, n=130)
+│   ├── 02_classifier_comparison.ipynb              # XGBoost vs RF, SVM, Logistic Regression
+│   ├── 03_feature_stability_analysis.ipynb         # 20-run repeated resampling stability
+│   ├── 04_external_validation_GSE21653.ipynb       # Frozen-model external validation
+│   ├── 05_genefu_intrinsic_labels_GSE21653.R       # PAM50 intrinsic re-labeling (R/genefu)
+│               
+├── models/                                          # Frozen production model artifacts
+│   ├── frozen_selector.pkl
+│   ├── frozen_scaler.pkl
+│   ├── frozen_model.pkl
+│   ├── frozen_label_encoder.pkl
+│   └── selected_probe_ids.pkl
 ├── results/
-│   └── top_biomarkers.csv
-└── .gitignore
+│   ├── classifier_comparison/
+│   ├── feature_stability/
+│   ├── external_validation/
+│   
+└── manuscript/
+    └── PrognosticMLbiomarkersBreastCancer-Manuscript.docx
 ```
+
+## Pipeline Summary
+
+1. **Discovery (notebook 01):** XGBoost classifier trained on GSE45827 (n=130, GPL570), 94.6% ± 3.1% 5-fold CV accuracy. SHAP TreeExplainer identifies a 46-gene biomarker panel. Reactome enrichment of the 46-gene panel (41 significant pathways, FDR<0.05), independently corroborating the GO/KEGG cell-cycle theme and specifically annotating CDCA5 to sister chromatid separation.
+
+2. **Classifier comparison (notebook 02):** Benchmarks XGBoost against Random Forest, SVM, and Logistic Regression under an identical preprocessing pipeline. Reported transparently: Random Forest and SVM both score numerically higher on raw CV accuracy (96.2% vs XGBoost's 92.3%). XGBoost's retention is justified by compatibility with SHAP's axiomatic attribution framework, not by raw accuracy.
+
+3. **Feature stability (notebook 03):** 20 repeated stratified resampling runs, evaluated at both a broad threshold (top-300 candidate retention) and a strict threshold (top-50 SHAP rank retention, matching the original panel-defining criterion). Differentiates confidence between panel genes — e.g., CDCA5 (50% strict stability) vs CMC2 (20%).
+
+4. **External validation (notebook 04 + R script 05):** The frozen model applied without refitting to GSE21653 (n=266, platform-matched GPL570). Evaluated against both native IHC-surrogate labels (63.7% accuracy) and genefu-derived intrinsic PAM50 labels (77.1% accuracy), with errors concentrated in the Luminal A/B boundary.
+
+## Key Findings
+
+- The 46-gene SHAP panel shows high broad-level stability (45/46 genes ≥50% retention) but more selective strict-level stability (24/46 genes ≥50%) — a distinction worth checking in any ML biomarker discovery pipeline, not just this one.
+- CDCA5 and CMC2, the two genes independently prognostic in METABRIC (see companion repo), are **not equally well-supported** by this pipeline's robustness testing: CDCA5 shows convergent evidence across every axis (top SHAP rank, 50% strict stability, Reactome annotation), while CMC2 shows weaker support (rank 47/50, 20% strict stability, no Reactome annotation).
+- External validation accuracy (63.7-77.1% depending on ground-truth label scheme) represents an expected, informative decline from internal CV accuracy (94.6%), concentrated specifically in the Luminal A/B boundary — consistent with the lowest internal per-subtype AUCs.
+
+## Reproducing This Work
+
+Each notebook is self-contained and can be run independently in Google Colab or Kaggle Notebooks (Python 3.12). Notebook 05 requires an R runtime (Kaggle or Colab R kernel) with Bioconductor packages `genefu`, `GEOquery`, and `hgu133plus2.db`. See in-notebook comments for exact package versions and known environment-specific installation notes (e.g., genefu's Bioconductor 3.20 build issue, worked around via GitHub source install).
+
+Frozen model artifacts in `models/` are required inputs for notebooks 02-04 and can be regenerated by running notebook 01, or downloaded directly from this repository.
+
+## Citation
+
+If you use this pipeline or its outputs, please cite the associated manuscript (see `manuscript/`).
 
 ## Setup
 
