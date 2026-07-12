@@ -1,0 +1,8 @@
+metric,value
+n_runs,20.0
+mean_test_accuracy,0.925
+sd_test_accuracy,0.05782710298748553
+mean_test_macro_f1,0.9162568354847765
+sd_test_macro_f1,0.07030600948655012
+min_test_accuracy,0.7692307692307693
+max_test_accuracy,1.0
