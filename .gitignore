@@ -1,0 +1,43 @@
+# Data files (large, downloaded at runtime)
+*.soft.gz
+*.soft
+GSE*_family*
+*.csv.gz
+
+# Frozen model artifacts — INTENTIONALLY NOT ignored.
+# models/*.pkl must stay tracked: notebooks 02-04 and 06 depend on loading
+# the exact frozen selector/scaler/model/label_encoder/probe_ids to remain
+# consistent with the manuscript's reported results. Do not add models/ here.
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# R (used by notebooks/05_genefu_intrinsic_labels_GSE21653.R)
+.Rhistory
+.RData
+.Rproj.user/
+*.Rproj
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Outputs that can be regenerated from scratch (optional — remove if you want
+# raw enrichment intermediate files tracked; results/pathway_enrichment/ CSVs
+# with the final results are tracked regardless of this rule)
+enrichment_cache/
+
+# Colab
+.config/
+sample_data/
+
+# Kaggle
+.kaggle/
