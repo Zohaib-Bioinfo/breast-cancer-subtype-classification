@@ -1,11 +1,30 @@
+# Core data acquisition and processing
 GEOparse>=2.0.4
 pandas>=2.0
 numpy>=2.0
+scipy>=1.16
+
+# Machine learning — discovery classifier + classifier comparison (RF, SVM, Logistic Regression)
 scikit-learn>=1.6
 xgboost>=3.0
+
+# Explainability and biomarker mapping
 shap>=0.52
-gseapy>=1.2
 mygene>=3.2
+
+# Pathway enrichment (GO, KEGG, Reactome)
+gseapy>=1.2
+
+# Visualization
 matplotlib>=3.10
 seaborn>=0.13
-scipy>=1.16
+
+# ---------------------------------------------------------------------------
+# R / Bioconductor dependencies (NOT installable via this file — see below)
+# ---------------------------------------------------------------------------
+# notebooks/05_genefu_intrinsic_labels_GSE21653.R requires an R environment
+# (Kaggle or Colab R kernel) with: genefu, GEOquery, Biobase, AnnotationDbi,
+# hgu133plus2.db. Bioconductor's genefu build has a known issue on
+# Bioconductor 3.20 — install directly from GitHub source instead:
+#   remotes::install_github("bhklab/genefu", upgrade = "never")
+# See in-notebook comments for the full install sequence.
