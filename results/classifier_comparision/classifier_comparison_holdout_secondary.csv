@@ -1,0 +1,5 @@
+Model,Holdout_Accuracy,Holdout_MacroF1,Holdout_WeightedF1,Holdout_ROC_AUC_OVR_Macro
+XGBoost,0.9615384615384616,0.9580419580419581,0.9612694997310383,1.0
+RandomForest,1.0,1.0,1.0,1.0
+SVM,1.0,1.0,1.0,1.0
+LogisticRegression,1.0,1.0,1.0,1.0
