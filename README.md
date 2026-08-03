@@ -1,5 +1,6 @@
 # Breast Cancer Subtype Classification — Pipeline README
 ### (Repo 1 of 2 — see [Companion Repository](#companion-repository-breast-cancer-survival-biomarkers) below)
+[breast-cancer-subtype-classification](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification)
 
 This repo answers two questions: (1) can a small XGBoost model trained on
 GSE45827 classify PAM50 molecular subtype from expression data, and
