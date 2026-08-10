@@ -1,231 +1,106 @@
-# Breast Cancer Subtype Classification — Pipeline README
-### (Repo 1 of 2 — see [Companion Repository](#companion-repository-breast-cancer-survival-biomarkers) below)
+# Breast Cancer Subtype Classification — Pipeline
+### (Repository 1 of 2 — see [Companion Repository](#-companion-repository-breast-cancer-survival-biomarkers) below)
 
-This repo answers two questions: (1) can a small XGBoost model trained on
-GSE45827 classify PAM50 molecular subtype from expression data, and
-(2) which genes drive that classification, and are they biologically
-coherent (pathway enrichment) and externally reproducible (GSE21653)?
+This repository contains the primary machine learning and bioinformatics pipeline designed to answer two central research questions: 
+1. Can a compact XGBoost model trained on GSE45827 robustly classify PAM50 molecular subtypes from microarray expression data?
+2. Which transcriptomic features drive that classification, and are they biologically coherent (pathway enrichment) and externally reproducible (GSE21653)?
 
-Its output — a reannotated biomarker gene panel — is also the direct
-input to a **second, separate repo** (`breast-cancer-survival-biomarkers`)
-that tests whether those same genes carry independent prognostic value in
-METABRIC. See the bottom of this file for that hand-off.
-
-**Read this before running anything:** the notebook numbers describe a
-*reading* order, not the *execution* order. Several notebooks depend on
-artifacts produced by higher-numbered notebooks. See
-[Execution Order](#execution-order) below — do not just run 01→02→...→06
-top to bottom, it will fail partway through.
-
-> ⚠️ **Reproducibility risk — three manual copy-paste hand-offs.**
-> There is no automated file-passing at three points in this pipeline:
-> `05` → `04` (genefu labels), `03` → `reannotate_probes_R` (probe list),
-> and `reannotate_probes_R` → **Companion Repo 2** (final gene panel).
-> Each is a human retyping/copy-pasting a list between notebooks. A typo
-> at any of these three points silently changes the reported gene panel
-> downstream with no error raised. See
-> [Known rough edges](#known-rough-edges) for specifics, and the mirrored
-> note in Companion Repo 2's README, which is the last of the three
-> hand-offs.
+The final output of this repository is a heavily validated, reannotated biomarker gene panel. This panel serves as the direct programmatic input to our companion repository, which tests whether these genes carry independent prognostic value in the METABRIC cohort.
 
 ---
 
-## Dataset
+## 📊 Datasets
 
-- **Source:** [GSE45827](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE45827) (Gene Expression Omnibus) — discovery cohort
+- **Source:** [GSE45827](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE45827) (Gene Expression Omnibus) — Discovery cohort
 - **Platform:** GPL570 (Affymetrix Human Genome U133 Plus 2.0 Array)
 - **Samples used:** 130 primary tumor samples (Basal: 41, HER2: 30, Luminal A: 29, Luminal B: 30)
-- **External validation:** [GSE21653](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE21653) — independent, platform-matched (GPL570) cohort, n=266
-
-## Execution order
-
-Run in **this** order, not filename order:
-
-```
-1. 01_internal_validation_GSE45827.ipynb        (independent)
-2. 02_classifier_comparison.ipynb               (independent)
-3. 04_external_validation_GSE21653.ipynb  — PART A ONLY (Cells 1-9)
-      creates: frozen_selector.pkl, frozen_scaler.pkl, frozen_model.pkl,
-               frozen_label_encoder.pkl, selected_probe_ids.pkl
-4. 05_genefu_intrinsic_labels_GSE21653_R.ipynb  (R kernel)
-      creates: genefu-derived PAM50 calls for the GSE21653 cohort
-5. 04_external_validation_GSE21653.ipynb  — PART B (Cells 10-11)
-      paste in the Cell-4 output as the hardcoded lookup table,
-      re-score against genefu labels instead of IHC-surrogate labels
-6. 03_feature_stability_analysis.ipynb
-      loads frozen_model.pkl from step 3
-      creates: reference_46gene_panel.csv (SHAP-ranked, top-50 probe list,
-               gene symbols via mygene "reporter" scope)
-7. reannotate_probes_R.ipynb  (R kernel)
-      paste in the top-50 probe list from step 6
-      creates: model_B_top50_reannotated.csv (authoritative gene symbols
-               via hgu133plus2.db, replacing the mygene lookup for those
-               50 probes)
-      ── this file's gene list is what feeds Companion Repo 2 ──
-8. 06_biomarker_characterization.ipynb
-      loads frozen_*.pkl from step 3 + reference_46gene_panel.csv from
-      step 6
-      creates: SHAP plot, KEGG/GO/Reactome enrichment, heatmap
-```
-
-Note: step 7 (`reannotate_probes_R.ipynb`) and step 8 (`06`) are
-**parallel consumers** of step 6's output, not sequential — 06 does not
-depend on 7. See [Known rough edges](#known-rough-edges) for a
-consistency note between them.
+- **External validation:** [GSE21653](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE21653) — Independent, platform-matched (GPL570) cohort, n=266
 
 ---
 
-## Dependency graph
+## ⚙️ Execution Order & Automated Hand-offs
 
-```
-01_internal_validation_GSE45827.ipynb         02_classifier_comparison.ipynb
-   (standalone — reports CV/holdout              (standalone — justifies
-    accuracy only, no saved artifacts)             XGBoost choice over RF/SVM)
+**Read this before running anything:** The notebook numbers describe the *reading/manuscript* order, not the *execution* order. 
 
-04_external_validation_GSE21653.ipynb  (Part A)
-   │
-   ├──creates──> frozen_selector.pkl
-   ├──creates──> frozen_scaler.pkl
-   ├──creates──> frozen_model.pkl
-   ├──creates──> frozen_label_encoder.pkl
-   └──creates──> selected_probe_ids.pkl
-   │
-   ├─────────────────────────────────────────────┐
-   │                                              │
-   ▼                                              ▼
-05_genefu_intrinsic_labels_GSE21653_R.ipynb   03_feature_stability_analysis.ipynb
-   │  (R kernel; computes genefu PAM50             │  loads frozen_model.pkl
-   │   calls for GSE21653 samples)                 │  (SHAP-based re-derivation,
-   │                                                │   20x resampling stability
-   ▼                                                │   check)
-04_external_validation_GSE21653.ipynb (Part B)      │
-   │  paste genefu output in, re-score              ▼
-   │  IHC-surrogate accuracy (63.7%)          reference_46gene_panel.csv
-   └─ → genefu-relabeled accuracy (77.1%)     (top-50 probes, mygene symbols)
-                                                     │
-                                       ┌─────────────┴─────────────┐
-                                       ▼                           ▼
-                       06_biomarker_characterization.ipynb   reannotate_probes_R.ipynb
-                          loads frozen_model.pkl + panel.csv    (R kernel; hgu133plus2.db
-                          → SHAP (labeled) / KEGG / GO /         reannotation, 43 unique
-                            Reactome / heatmap                   symbols)
-                                                                  │
-                                                                  ▼
-                                                    model_B_top50_reannotated.csv
-                                                                  │
-                                            ════════ REPO BOUNDARY ════════
-                                                                  │
-                                                                  ▼
-                                          COMPANION REPO 2: breast-cancer-survival-biomarkers
-                                          01_metabric_prognostic_validation.ipynb
-                                             Cell 5: biomarker_genes = [...43 symbols...]
-                                             → METABRIC Cox/KM prognostic validation
-```
+This pipeline is designed for strict computational reproducibility via **fully automated programmatic hand-offs**. Artifacts (models, scalers, and CSV data tables) are saved to disk and seamlessly ingested by downstream notebooks, ensuring zero manual transcription errors between Python and R kernels. 
 
-**Why 03 and 06 are numbered lower/higher than what they depend on:**
-03 and 06 are downstream of the frozen model created in 04. The numbering
-reflects manuscript section order (feature stability is discussed before
-external validation in the write-up), not code dependency order. This is
-intentional but easy to trip over — hence this README.
+**Run the pipeline in this exact order:**
+
+1. **`01_internal_validation_GSE45827.ipynb`** (Independent execution)
+2. **`02_classifier_comparison.ipynb`** (Independent execution)
+3. **`04_external_validation_GSE21653.ipynb`** — **PART A ONLY** (Cells 1–9)
+   * *Outputs:* `frozen_selector.pkl`, `frozen_scaler.pkl`, `frozen_model.pkl`, `frozen_label_encoder.pkl`, `selected_probe_ids.pkl`
+4. **`05_genefu_intrinsic_labels_GSE21653_R.ipynb`** (R kernel)
+   * *Outputs:* `gse21653_genefu_intrinsic_labels.csv` (PAM50 calls)
+5. **`04_external_validation_GSE21653.ipynb`** — **PART B** (Cells 10–11)
+   * *Action:* Programmatically loads the genefu CSV output and re-scores the frozen model against intrinsic labels.
+6. **`03_feature_stability_analysis.ipynb`**
+   * *Action:* Loads the frozen XGBoost model.
+   * *Outputs:* `46gene_panel_stability_STRICT_top50.csv` (SHAP-ranked top-50 probes, mygene symbols)
+7. **`reannotate_probes_R.ipynb`** (R kernel)
+   * *Action:* Dynamically reads the stability CSV from Step 6.
+   * *Outputs:* `model_B_top50_reannotated.csv` (Authoritative mapping via hgu133plus2.db). **This file feeds Companion Repo 2.**
+8. **`06_biomarker_characterization.ipynb`**
+   * *Action:* Loads frozen artifacts (from Step 3) + the top-50 CSV (from Step 6).
+   * *Outputs:* Final SHAP plots, KEGG/GO/Reactome enrichment profiles, and expression heatmaps.
+
+*Note: Steps 7 and 8 are parallel consumers of Step 6. They do not depend on one another.*
 
 ---
 
-## Notebook reference
+## 📓 Notebook Reference
 
-| # | Notebook | Purpose | Reads | Writes | Depends on |
+| # | Notebook | Purpose | Input / Reads | Output / Writes | Depends On |
 |---|---|---|---|---|---|
-| 01 | `01_internal_validation_GSE45827.ipynb` | Honest internal accuracy estimate: 80/20 holdout (96.15%) + leak-free 5-fold CV inside a `Pipeline` (**93.08% ± 5.10%**) | GSE45827 (GEO) | — (prints metrics only) | none |
-| 02 | `02_classifier_comparison.ipynb` | Compares RF / SVM / XGBoost on raw CV accuracy; documents why XGBoost was retained despite RF/SVM scoring higher on raw accuracy (SHAP interpretability) | GSE45827 (GEO) | — (prints comparison table) | none |
-| 03 | `03_feature_stability_analysis.ipynb` | Re-derives the top-50/43-gene panel via SHAP **on the frozen model**, then runs 20 resampling folds to check gene selection frequency (e.g. CDCA5, CMC2). Gene symbols via `mygene` | `frozen_model.pkl` (from 04) | `reference_46gene_panel.csv` | **04** |
-| 04 | `04_external_validation_GSE21653.ipynb` | Part A: fits + freezes the production model on all 130 GSE45827 samples, validates on GSE21653 against IHC-surrogate labels (63.7%). Part B: re-scores against genefu-derived labels (77.1%) | GSE45827, GSE21653 (GEO), genefu output (from 05) | `frozen_*.pkl` × 5, prediction/metrics CSV+JSON | **05** (Part B only) |
-| 05 | `05_genefu_intrinsic_labels_GSE21653_R.ipynb` | R notebook; computes genefu-package intrinsic PAM50 calls for the GSE21653 cohort as a cleaner ground truth than IHC-surrogate labels | GSE21653 (GEO), R `genefu` package | genefu label table (pasted manually into 04 Part B) | none |
-| 06 | `06_biomarker_characterization.ipynb` | SHAP (properly labeled, on the frozen model) + KEGG/GO/Reactome enrichment + expression heatmap, all sourced only from the frozen model + panel — no refitting | `frozen_*.pkl` (from 04), `reference_46gene_panel.csv` (from 03) | SHAP/enrichment/heatmap figures, `enrichment_results_all.csv` | **04, 03** |
-| — | `reannotate_probes_R.ipynb` | R notebook; re-annotates the top-50 panel probes against `hgu133plus2.db` (manufacturer-curated) instead of `mygene`'s lossier "reporter" scope. 46/50 probes resolve to 43 unique symbols; 4 probes remain unmapped even with the curated DB (`215593_at`, `229150_at`, `242580_at`, `233445_at`). **Its output is the actual gene panel used in Companion Repo 2**, not an internal dependency of `06` | Top-50 probe list (pasted manually from 03) | `model_B_top50_reannotated.csv` | **03** |
+| 01 | `01_internal_validation_GSE45827.ipynb` | Internal accuracy estimate: 80/20 holdout (96.15%) + leak-free 5-fold CV inside a scikit-learn `Pipeline`. | GSE45827 (GEO) | — | None |
+| 02 | `02_classifier_comparison.ipynb` | Compares RF, SVM, and XGBoost on raw CV accuracy. Documents why XGBoost is retained for SHAP interpretability. | GSE45827 (GEO) | — | None |
+| 03 | `03_feature_stability_analysis.ipynb` | Re-derives the top-50 gene panel via SHAP on the frozen model. Runs 20 resampling folds to verify stability (e.g., CDCA5, CMC2). | `frozen_model.pkl` | `46gene_panel_stability_STRICT_top50.csv` | **04** |
+| 04 | `04_external_validation_GSE21653.ipynb` | Part A: Fits/freezes production model on 130 samples. validates vs IHC labels. Part B: Re-scores vs genefu labels. | GSE45827, GSE21653, genefu CSV | `frozen_*.pkl` files, metrics CSV/JSON | **05** (Part B) |
+| 05 | `05_genefu_intrinsic_labels_GSE21653_R.ipynb` | (R Kernel) Computes intrinsic PAM50 calls for GSE21653 cohort as cleaner ground truth than IHC surrogates. | GSE21653 (GEO) | `gse21653_genefu_intrinsic_labels.csv` | None |
+| 06 | `06_biomarker_characterization.ipynb` | SHAP mapping, KEGG/GO/Reactome enrichment, and expression heatmaps using the frozen model. | `frozen_*.pkl`, stability CSV | Enrichment CSVs, Figures | **04, 03** |
+| — | `reannotate_probes_R.ipynb` | (R Kernel) Maps top-50 probes against `hgu133plus2.db` (manufacturer-curated) resolving to 43 unique authoritative symbols. | Stability CSV | `model_B_top50_reannotated.csv` | **03** |
 
 ---
 
-## Companion Repository: [breast-cancer-survival-biomarkers](https://github.com/Zohaib-Bioinfo/breast-cancer-survival-biomarkers)
+## 📈 Results Highlights
 
-`reannotate_probes_R.ipynb`'s 43-symbol output is pasted directly into
-**`01_metabric_prognostic_validation.ipynb`** (Cell 5, `biomarker_genes`
-list) in the separate `breast-cancer-survival-biomarkers` repo, which:
+**Classifier Performance:**
+* **5-Fold CV Accuracy (XGBoost):** 93.1% ± 5.1%
+* **ROC-AUC (Internal):** Basal (1.000), HER2 (0.999), Luminal A (0.987), Luminal B (0.981)
+* **External Validation (GSE21653):** 63.7% vs. IHC-surrogate labels | 77.1% vs. genefu-intrinsic labels
 
-1. Loads METABRIC clinical data (`data_clinical_patient.txt`,
-   `data_clinical_sample.txt`), filters to the 4 matching subtypes →
-   **1,608-patient cohort**
-2. Pulls z-scored mRNA expression for the 43 panel genes via the
-   cBioPortal API — **42 of 43 resolve** to Entrez IDs in cBioPortal
-3. Fits two Cox proportional-hazards models: clinical-only (age, lymph
-   nodes, NPI, subtype) vs. clinical + biomarker genes — **41 genes**
-   enter the final model (some further drop from the Cox design matrix)
-4. Reports C-index improvement: **0.6567 → 0.6752** with the gene panel
-   added
-5. Identifies CDCA5, IL23A, and AQP5 as independently significant
-   (p < 0.05) in the multivariate model; CDCA5 is used for the
-   Kaplan-Meier stratification figure (log-rank p = 1.69×10⁻⁹)
+**Feature Stability (Strict-Threshold, 20 Runs):**
+* IL23A: 95% (19/20)
+* AQP5: 90% (18/20)
+* CDCA5: 50% (10/20)
+* CMC2: 20% (4/20)
 
-**The 43 → 42 → 41 gene count reduction across these two repos is
-expected, not a bug** — it reflects (a) one symbol not present in
-cBioPortal's METABRIC gene set, and (b) further attrition when building
-the Cox design matrix. Worth stating explicitly in the manuscript Methods
-so a reviewer doesn't read the changing gene count as an inconsistency.
+**Generated Visualizations:**
+* `figures/PCA_subtypes.png` — PCA demonstrating pre-modeling subtype separability
+* `figures/biomarker_heatmap.png` — Expression gradients of top biomarker genes across subtypes
+* `figures/ROC_CV_curves.png` — Multi-class ROC bounds across cross-validation folds
+* `figures/enrichment_dotplot.png` — Biological pathway enrichment mappings
 
 ---
 
-## Known rough edges
+## 🔗 Companion Repository (Breast Cancer Survival Biomarkers)
 
-1. **05 → 04 genefu hand-off is a manual copy-paste**, not a file read. `05` prints a lookup table; that table gets pasted into a hardcoded cell in `04` Part B. If revisited, `05` should write a CSV and `04` should read it.
+For the downstream clinical evaluation of our gene panel, please see the **[Companion Repository](https://github.com/Zohaib-Bioinfo/breast-cancer-survival-biomarkers)**.
 
-2. **03 → reannotate_probes_R probe-list hand-off is also a manual copy-paste.** Same fix applies.
-
-3. **reannotate_probes_R → Companion Repo 2 hand-off is a third manual copy-paste** (the 43-symbol list retyped into Cell 5 of `01_metabric_prognostic_validation.ipynb`). Three manual hand-offs in the full pipeline is the main reproducibility risk in this project — a single typo anywhere in this chain silently changes the reported gene panel downstream with no error thrown.
-
-4. **Optional, not required:** `06`'s Cell 6 still falls back to `mygene` (`"reporter"` scope) for the ~250 probes outside the top-50, since `reannotate_probes_R.ipynb` was written for the Companion Repo 2 panel, not for `06`. If you want full consistency within Repo 1 itself, `06` could optionally merge `model_B_top50_reannotated.csv` in for its top-50 labels too — but this is a nice-to-have, not something the actual manuscript pipeline depends on.
+**Reproducibility Hand-off:**
+The output from this repository (`model_B_top50_reannotated.csv` generated by step 7) acts as the starting point for Repo 2. That CSV is loaded programmatically into `01_metabric_prognostic_validation.ipynb` to construct multivariate Cox proportional-hazards models and Kaplan-Meier stratification analyses over a 1,608-patient METABRIC cohort.
 
 ---
 
-## Environment
+## 🛠 Setup & Environment
 
-- Google Colab (all `0X_*.ipynb` notebooks except `05` and `reannotate_probes_R.ipynb`, which need an R kernel — either Colab's R runtime or local RStudio)
-- Frozen artifacts and intermediate CSVs are persisted to Google Drive between sessions; set `ARTIFACT_DIR` at the top of each notebook to the correct Drive path before running
-- Key packages: `GEOparse`, `xgboost`, `shap`, `gseapy`, `mygene`, `scikit-learn`, R `genefu`, R `hgu133plus2.db`/`AnnotationDbi`
-- Companion repo additionally needs: `requests` (cBioPortal API), `lifelines`, `statsmodels`
+**Requirements:**
+* **Python environment:** Requires `GEOparse`, `xgboost`, `shap`, `gseapy`, `mygene`, `scikit-learn`.
+* **R environment:** Requires `genefu`, `hgu133plus2.db`, `AnnotationDbi` (can be run via Colab's R kernel or local RStudio).
+* **Storage:** Set the `ARTIFACT_DIR` path at the top of notebooks to ensure frozen models and intermediary CSVs persist properly (e.g., Google Drive for Colab execution).
 
-## Manuscript mapping
-
-Model architecture (`SelectKBest k=300 → StandardScaler → XGBoost,
-n_estimators=100, max_depth=6, learning_rate=0.3`) corresponds to Methods
-2.2 / Supplementary Table S1. Internal CV accuracy reported in the
-manuscript: **93.08% ± 5.10%** (from notebook 01).
-
-## Results
-
-| Metric | Value |
-|---|---|
-| 5-Fold CV Accuracy (XGBoost) | 93.1% ± 5.1% |
-| ROC-AUC (Basal) | 1.000 |
-| ROC-AUC (HER2) | 0.999 |
-| ROC-AUC (Luminal A) | 0.987 |
-| ROC-AUC (Luminal B) | 0.981 |
-| External validation accuracy (vs. IHC-surrogate labels, GSE21653) | 63.7% |
-| External validation accuracy (vs. genefu-intrinsic labels, GSE21653) | 77.1% |
-| CDCA5 strict-threshold feature stability (20 runs) | 50% (10/20) |
-| CMC2 strict-threshold feature stability (20 runs) | 20% (4/20) |
-| AQP5 strict-threshold feature stability (20 runs) | 90% (18/20) |
-| IL23A strict-threshold feature stability (20 runs) | 95% (19/20) |
-
-### Visualizations
-
-- `figures/PCA_subtypes.png` — PCA showing subtype separability
-- `figures/biomarker_heatmap.png` — Expression heatmap of top biomarker genes
-- `figures/ROC_CV_curves.png` — Cross-validated multi-class ROC curves
-- `figures/enrichment_dotplot.png` — Pathway enrichment results
-- `figures/confusion_matrix.png` — Classification confusion matrix
-
-## Setup
-
-```
-git clone https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification.git
+```bash
+git clone [https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification.git](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification.git)
 cd breast-cancer-subtype-classification
 pip install -r requirements.txt
 ```
